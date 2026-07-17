@@ -1,0 +1,217 @@
+{% extends 'admin_sidebar.html' %}
+{% load static %}
+
+{% block content %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>New Sale</title>
+    <style>
+        .form-hero{
+            width:100%;
+            padding:44px 48px;
+            background:
+                linear-gradient(120deg, rgba(11,37,69,0.90), rgba(23,190,187,0.4)),
+                url('https://images.unsplash.com/photo-1441986300917-64674bd600d8?auto=format&fit=crop&w=1600&q=75') center/cover no-repeat;
+            color:#fff;
+        }
+        .form-hero h1{font-size:32px; margin:0 0 6px 0; letter-spacing:-0.02em;}
+        .form-hero p{margin:0; color:rgba(255,255,255,0.85); font-size:14.5px;}
+
+        .form-page{
+            width:100%;
+            padding:44px 48px 60px 48px;
+            background:#F6F8FB;
+            min-height:100vh;
+            display:flex;
+            justify-content:center;
+        }
+
+        .form-card{
+            width:100%;
+            max-width:620px;
+            background:#fff;
+            border-radius:16px;
+            box-shadow:0 8px 24px rgba(11,37,69,0.08);
+            border:1px solid #E3EAF1;
+            padding:36px 38px;
+        }
+
+        .field-group{margin-bottom:20px;}
+        .field-group label{
+            font-weight:600;
+            display:block;
+            margin-bottom:8px;
+            font-size:13.5px;
+            color:#0B2545;
+            text-transform:uppercase;
+            letter-spacing:0.04em;
+        }
+        .field-group input, .field-group select{
+            width: 100%;
+            padding: 12px 14px;
+            border-radius: 9px;
+            border: 1.5px solid #E3EAF1;
+            font-size: 15px;
+            font-family:'Inter',sans-serif;
+            background:#F9FBFD;
+        }
+        .field-group select:disabled{color:#A9B7C4; background:#F0F3F7;}
+        .field-group input:focus, .field-group select:focus{outline:none; border-color:#17BEBB; background:#fff;}
+
+        #stock-info{
+            font-weight: 600;
+            color: #0e8f8d;
+            background:#E8FBFA;
+            border:1px solid #C7F1EF;
+            padding:10px 14px;
+            border-radius:8px;
+            margin-bottom: 20px;
+            font-family:'IBM Plex Mono',monospace;
+            font-size:13.5px;
+            min-height:14px;
+        }
+
+        .error-box{
+            color: #B3261E;
+            font-weight: 600;
+            margin-bottom: 20px;
+            background:#FDEDEC;
+            border:1px solid #F5C6C3;
+            padding:10px 14px;
+            border-radius:8px;
+            font-size:14px;
+        }
+
+        .btn-submit{
+            width:100%;
+            padding: 14px;
+            background: linear-gradient(135deg,#F4A93A,#DC8E1D);
+            color: #0B2545;
+            font-size: 15.5px;
+            border: none;
+            border-radius: 9px;
+            font-weight: 700;
+            cursor: pointer;
+            box-shadow:0 8px 18px rgba(244,169,58,0.32);
+        }
+    </style>
+</head>
+<body>
+    <div class="form-hero">
+        <h1>New Sale Entry</h1>
+        <p>Log a sale and automatically deduct stock from inventory.</p>
+    </div>
+
+    <div class="form-page">
+        <div class="form-card">
+            <form method="POST">
+                {% csrf_token %}
+
+                <div class="field-group">
+                    <label for="customer_name">Customer Name</label>
+                    <input type="text" name="customer_name" id="customer_name" required>
+                </div>
+
+                <div class="field-group">
+                    <label for="customer_phone">Customer Phone</label>
+                    <input type="tel" pattern="[1-9]\d{9}" maxlength="10" name="customer_phone" id="customer_phone" required>
+                </div>
+
+                <div class="field-group">
+                    <label for="product">Select Product</label>
+                    <select name="product" id="product" required>
+                        <option value="">-- Select Product --</option>
+                        {% for product in products %}
+                            <option value="{{ product.id }}">{{ product.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="field-group">
+                    <label for="size">Select Size</label>
+                    <select name="size" id="size" required disabled>
+                        <option value="">-- Select Size --</option>
+                    </select>
+                </div>
+
+                <p id="stock-info"></p>
+
+                <div class="field-group">
+                    <label for="quantity">Quantity</label>
+                    <input type="number" name="quantity" min="1" id="quantity" required>
+                </div>
+
+                {% if error %}
+                <div class="error-box">
+                    {{ error }}
+                </div>
+                {% endif %}
+
+                <button type="submit" class="btn-submit">
+                    Submit Sale
+                </button>
+            </form>
+        </div>
+    </div>
+</body>
+</html>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const productSelect = document.getElementById('product');
+        const sizeSelect = document.getElementById('size');
+        const stockInfo = document.getElementById('stock-info');
+
+        productSelect.addEventListener('change', function () {
+            const productId = this.value;
+            sizeSelect.innerHTML = '<option value="">-- Loading Sizes --</option>';
+            sizeSelect.disabled = true;
+            stockInfo.textContent = '';
+
+            if (productId) {
+                fetch(`/get-sizes/${productId}/`)
+                    .then(response => response.json())
+                    .then(data => {
+                        sizeSelect.innerHTML = '<option value="">-- Select Size --</option>';
+                        data.forEach(function (size) {
+                            const option = document.createElement('option');
+                            option.value = size;
+                            option.textContent = size;
+                            sizeSelect.appendChild(option);
+                        });
+                        sizeSelect.disabled = data.length === 0;
+                    })
+                    .catch(error => {
+                        console.error('Error fetching sizes:', error);
+                        sizeSelect.innerHTML = '<option value="">-- Error Loading Sizes --</option>';
+                        sizeSelect.disabled = true;
+                    });
+            } else {
+                sizeSelect.innerHTML = '<option value="">-- Select Size --</option>';
+                sizeSelect.disabled = true;
+                stockInfo.textContent = '';
+            }
+        });
+
+        sizeSelect.addEventListener('change', function () {
+            const productId = productSelect.value;
+            const sizeValue = this.value;
+            stockInfo.textContent = '';
+
+            if (productId && sizeValue) {
+                fetch(`/get-stock/${productId}/${sizeValue}/`)
+                    .then(response => response.json())
+                    .then(data => {
+                        stockInfo.textContent = `Available stock for size ${sizeValue}: ${data.stock}`;
+                    })
+                    .catch(error => {
+                        console.error('Error fetching stock:', error);
+                        stockInfo.textContent = 'Error loading stock info.';
+                    });
+            }
+        });
+    });
+</script>
+
+{% endblock %}

@@ -1,0 +1,137 @@
+{% extends 'admin_sidebar.html' %}
+{% load static %}
+
+{% block content %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>{% if product %}Edit Product{% else %}Add Product{% endif %}</title>
+    <style>
+        .form-hero{
+            width:100%;
+            padding:44px 48px;
+            background:
+                linear-gradient(120deg, rgba(11,37,69,0.90), rgba(23,190,187,0.45)),
+                url('https://images.unsplash.com/photo-1489987707025-afc232f7ea0f?auto=format&fit=crop&w=1600&q=75') center/cover no-repeat;
+            color:#fff;
+        }
+        .form-hero h1{font-size:32px; margin:0 0 6px 0; letter-spacing:-0.02em;}
+        .form-hero p{margin:0; color:rgba(255,255,255,0.85); font-size:14.5px;}
+
+        .form-page{
+            width:100%;
+            padding:44px 48px 60px 48px;
+            background:#F6F8FB;
+            min-height:100vh;
+            display:flex;
+            justify-content:center;
+        }
+
+        .form-card{
+            width:100%;
+            max-width:620px;
+            background:#fff;
+            border-radius:16px;
+            box-shadow:0 8px 24px rgba(11,37,69,0.08);
+            border:1px solid #E3EAF1;
+            padding:36px 38px;
+        }
+
+        .field-group{margin-bottom:22px;}
+        .field-group label{
+            font-weight:600;
+            display:block;
+            margin-bottom:8px;
+            font-size:13.5px;
+            color:#0B2545;
+            text-transform:uppercase;
+            letter-spacing:0.04em;
+        }
+        .field-group input[type="text"],
+        .field-group input[type="number"],
+        .field-group input[type="file"]{
+            width: 100%;
+            padding: 12px 14px;
+            border-radius: 9px;
+            border: 1.5px solid #E3EAF1;
+            font-size: 15px;
+            font-family:'Inter',sans-serif;
+            background:#F9FBFD;
+            transition:border-color .15s ease;
+        }
+        .field-group input:focus{outline:none; border-color:#17BEBB; background:#fff;}
+
+        .current-thumb img{
+            max-width:110px; height:auto; border-radius:10px;
+            border: 1px solid #E3EAF1;
+            margin-bottom:12px;
+        }
+
+        .btn-submit{
+            width:100%;
+            padding: 14px;
+            background: linear-gradient(135deg,#F4A93A,#DC8E1D);
+            color: #0B2545;
+            font-size: 15.5px;
+            border: none;
+            border-radius: 9px;
+            font-weight: 700;
+            cursor: pointer;
+            margin-top:6px;
+            box-shadow:0 8px 18px rgba(244,169,58,0.32);
+        }
+    </style>
+</head>
+<body>
+    <div class="form-hero">
+        {% if product %}
+            <h1>Edit Product</h1>
+            <p>Update the details for this catalog item.</p>
+        {% else %}
+            <h1>Add New Product</h1>
+            <p>Add a new item to your clothing catalog.</p>
+        {% endif %}
+    </div>
+
+    <div class="form-page">
+        <div class="form-card">
+            <form method="POST" action="{% url 'admin_add_product' %}" enctype="multipart/form-data">
+                {% csrf_token %}
+
+                <div class="field-group">
+                    <label for="product_name">Product Name</label>
+                    <input type="text" name="product_name" id="product_name" value="{{product.name}}" required>
+                </div>
+
+                <div class="field-group">
+                    <label for="description">Description</label>
+                    <input type="text" name="description" id="description" value="{{product.description}}" required>
+                </div>
+
+                <div class="field-group">
+                    <label for="price">Price</label>
+                    <input type="number" name="price" id="price" min="1" value="{{product.price}}" required>
+                </div>
+
+                <div class="field-group">
+                    <label for="image">Product Image</label>
+
+                    {% if product.image %}
+                        <div class="current-thumb">
+                            <img src="{{ product.image.url }}" alt="Product Image">
+                        </div>
+                    {% endif %}
+
+                    <input type="file" name="image" id="image" value="{{ product.image.url }}" required>
+                </div>
+
+                <input type="hidden" name="product_id" value="{{ product.id }}">
+                <button type="submit" class="btn-submit">
+                    {% if product %}Update Product{% else %}Add Product{% endif %}
+                </button>
+            </form>
+        </div>
+    </div>
+</body>
+</html>
+{% endblock %}

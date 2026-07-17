@@ -1,0 +1,144 @@
+{% extends 'admin_sidebar.html' %}
+{% load static %}
+
+{% block content %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <title>Admin Inventory</title>
+    <style>
+        .inv-hero{
+            width:100%;
+            padding:44px 48px;
+            background:
+                linear-gradient(120deg, rgba(11,37,69,0.90), rgba(23,190,187,0.4)),
+                url('https://images.unsplash.com/photo-1553413077-190dd305871c?auto=format&fit=crop&w=1600&q=75') center/cover no-repeat;
+            color:#fff;
+        }
+        .inv-hero h1{font-size:32px; margin:0 0 6px 0; letter-spacing:-0.02em;}
+        .inv-hero p{margin:0; color:rgba(255,255,255,0.85); font-size:14.5px;}
+
+        .dashboard-container{
+            width:100%;
+            padding: 36px 48px 60px 48px;
+            background-color: #F6F8FB;
+            min-height: 100vh;
+        }
+
+        .table-shell{
+            background:#fff;
+            border-radius:14px;
+            box-shadow:0 8px 24px rgba(11,37,69,0.08);
+            border:1px solid #E3EAF1;
+            overflow:hidden;
+        }
+
+        .table-wrapper{
+            max-height: 560px;
+            overflow-y: auto;
+        }
+
+        .table-class{
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .table-data{
+            padding: 16px 22px;
+            text-align: left;
+            border-bottom: 1px solid #EEF2F6;
+            font-size:14.5px;
+        }
+
+        thead th{
+            position: sticky;
+            top: 0;
+            background: #0B2545;
+            color: white;
+            font-family:'Space Grotesk',sans-serif;
+            font-weight:600;
+            font-size:13px;
+            text-transform:uppercase;
+            letter-spacing:0.05em;
+            z-index: 2;
+        }
+
+        tbody tr:hover{background:#F9FBFD;}
+
+        .inv-thumb{
+            height: 54px; width:54px; object-fit:cover;
+            border-radius: 8px;
+            border:1px solid #E3EAF1;
+        }
+
+        .icon-link{
+            width:34px; height:34px;
+            border-radius:8px;
+            display:inline-flex;
+            align-items:center;
+            justify-content:center;
+            background:#F6F8FB;
+            border:1px solid #E3EAF1;
+            transition:background .15s ease;
+        }
+        .icon-link:hover{background:#EEF2F6;}
+
+        .empty-row{text-align:center; padding:40px; color:#5A7080; font-size:14.5px;}
+    </style>
+</head>
+<body>
+    <div class="inv-hero">
+        <h1>Inventory Overview</h1>
+        <p>Track stock levels across every product and size.</p>
+    </div>
+
+    <div class="dashboard-container">
+        <div class="table-shell">
+            <div class="table-wrapper">
+                <table class="table-class">
+                    <thead>
+                        <tr>
+                            <th class="table-data">ID</th>
+                            <th class="table-data">Name</th>
+                            <th class="table-data">Description</th>
+                            <th class="table-data">Image</th>
+                            <th class="table-data">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for product in products %}
+                        <tr>
+                            <td class="table-data mono">#{{ product.id }}</td>
+                            <td class="table-data" style="font-weight:600;">{{ product.name }}</td>
+                            <td class="table-data" style="color:#5A7080;">{{ product.description }}</td>
+                            <td class="table-data">
+                                    <img src="{{ product.image.url }}" alt="Product Image" class="inv-thumb" />
+                                </td>
+                            <td class="table-data">
+                                <div style="display: flex; gap: 10px; align-items: center;">
+                                    <a href="{% url 'admin_add_inventory' product.id %}" title="Add Inventory" class="icon-link">
+                                        <i class="fa-solid fa-plus" style="color: #2EAD6D;"></i>
+                                    </a>
+                                    <a href="{% url 'admin_view_inventory' product.id %}" title="View" class="icon-link">
+                                        <i class="fa-solid fa-eye" style="color: #17BEBB;"></i>
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="5" class="empty-row">No products available.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
+{% endblock %}

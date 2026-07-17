@@ -1,0 +1,12 @@
+
+
+Django
+pillow
+psycopg2-binary
+Pillow
+requests
+boto3
+analysis-plot-lib
+pandas
+plotly
+pdf-export-lib==0.2.0

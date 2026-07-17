@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    {% load static %}
+
+    <link rel="stylesheet" href="{% static 'css/animations.css' %}">
+    <link rel="stylesheet" href="{% static 'css/main.css' %}">
+    <link rel="stylesheet" href="{% static 'css/admin.css' %}">
+
+    <link href='https://cdn.jsdelivr.net/npm/boxicons@2.1.2/css/boxicons.min.css' rel='stylesheet'>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
+
+    <style>
+        :root{
+            --bg:#F6F8FB;
+            --surface:#FFFFFF;
+            --ink:#0B2545;
+            --ink-soft:#5A7080;
+            --line:#E3EAF1;
+            --gold:#F4A93A;
+            --gold-dark:#DC8E1D;
+            --teal:#17BEBB;
+            --coral:#FF6363;
+            --green:#2EAD6D;
+            --radius:14px;
+            --shadow: 0 8px 24px rgba(11,37,69,0.08);
+        }
+        *{box-sizing:border-box;}
+        html,body{margin:0;padding:0;}
+        body{
+            display:flex;
+            min-height:100vh;
+            font-family:'Inter',sans-serif;
+            background:var(--bg);
+            color:var(--ink);
+        }
+        h1,h2,h3,h4{font-family:'Space Grotesk',sans-serif;}
+        code, .mono, .stat-value, .table-data.mono{font-family:'IBM Plex Mono',monospace;}
+
+        /* ===== Sidebar ===== */
+        .menu{
+            width:270px;
+            min-width:270px;
+            display:flex;
+            flex-direction:column;
+            background:
+                linear-gradient(180deg, rgba(11,37,69,0.94), rgba(11,37,69,0.98)),
+                url('https://images.unsplash.com/photo-1489987707025-afc232f7ea0f?auto=format&fit=crop&w=800&q=60');
+            background-size:cover;
+            background-position:center;
+            position:sticky;
+            top:0;
+            height:100vh;
+            box-shadow:2px 0 20px rgba(0,0,0,0.15);
+            z-index:10;
+        }
+        .menu-container{width:100%; border-collapse:collapse;}
+        .menu-row{margin:0;}
+        .menu-btn{padding:0; color:white; text-align:left;}
+        .menu-btn a{color:rgba(255,255,255,0.82); text-decoration:none; display:block;}
+        .menu-btn:hover{background-color:rgba(244,169,58,0.14);}
+        .menu-btn:hover a{color:#ffffff;}
+
+        .menu-icon-dashbord:first-child, tr.menu-row:first-child .menu-btn{
+            border-bottom:1px solid rgba(255,255,255,0.12);
+            margin-bottom:8px;
+        }
+
+        .menu-active{
+            background:linear-gradient(90deg, rgba(244,169,58,0.22), transparent);
+            border-left:4px solid var(--gold);
+        }
+        .menu-active a{color:#ffffff !important; font-weight:600;}
+
+        .logout-btn{
+            margin:15px;
+            background:transparent;
+            border:1.5px solid rgba(255,255,255,0.35);
+            color:#fff;
+            padding:10px 16px;
+            border-radius:8px;
+            font-family:'Inter',sans-serif;
+            font-weight:600;
+            cursor:pointer;
+            width:calc(100% - 30px);
+            transition:all .2s ease;
+        }
+        .logout-btn:hover{background:var(--coral); border-color:var(--coral);}
+
+        .content{
+            max-width:unset;
+            width:100%;
+            flex:1;
+            min-width:0;
+            background:var(--bg);
+        }
+
+        /* Shared page primitives reused by inner templates */
+        .page-wrap{width:100%; min-height:100vh; padding:0;}
+        .page-hero{
+            width:100%;
+            padding:44px 48px;
+            background:
+                linear-gradient(120deg, rgba(11,37,69,0.90), rgba(23,190,187,0.55)),
+                center/cover no-repeat;
+            color:#fff;
+            position:relative;
+        }
+        .page-hero h1{
+            font-size:34px;
+            margin:0 0 6px 0;
+            letter-spacing:-0.02em;
+        }
+        .page-hero p{margin:0; color:rgba(255,255,255,0.85); font-size:15px;}
+        .page-body{padding:36px 48px 60px 48px; width:100%;}
+
+        .card-surface{
+            background:var(--surface);
+            border-radius:var(--radius);
+            box-shadow:var(--shadow);
+            border:1px solid var(--line);
+        }
+
+        table{width:100%;}
+    </style>
+</head>
+<body>
+
+    <div class="menu">
+        <table class="menu-container">
+            <tr class="menu-row">
+                <td class="menu-btn menu-icon-dashbord">
+                    <a href="{% url 'admin_home' %}" class="non-style-link-menu">
+                        <div style="color:#ffffff; padding:22px 20px; font-size:26px; font-weight:700; font-family:'Space Grotesk',sans-serif; display:flex; align-items:center; gap:10px;">
+                            <i class='bx bxs-purchase-tag' style="color:#ffffff;"></i> Inventory
+                        </div>
+                    </a>
+                </td>
+            </tr>
+            <tr class="menu-row">
+                <td class="menu-btn menu-icon-dashbord {% if request.path == '/admin_home' %} menu-active {% endif %}">
+                    <a href="{% url 'admin_home' %}" class="non-style-link-menu">
+                        <div style="padding: 14px 20px; display: flex; align-items: center; color:#ffffff;">
+                            <i class='bx bxs-dashboard' style="font-size: 19px; margin-right: 12px;"></i>
+                            <span>Dashboard</span>
+                        </div>
+                    </a>
+                </td>
+            </tr>
+            <tr class="menu-row">
+                <td class="menu-btn menu-icon-doctor {% if request.path == '/admin_products' %} menu-active {% endif %}">
+                    <a href="{% url 'admin_products' %}" class="non-style-link-menu non-style-link-menu-active">
+                        <div style="padding: 14px 20px; display: flex; align-items: center; color:#ffffff;">
+                            <i class='bx bxs-pyramid' style="font-size: 19px; margin-right: 12px;"></i>
+                            <span>Products</span>
+                        </div>
+                    </a>
+                </td>
+            </tr>
+            <tr class="menu-row">
+                <td class="menu-btn menu-icon-schedule {% if request.path == '/admin_inventory' %} menu-active {% endif %}">
+                    <a href="{% url 'admin_inventory' %}" class="non-style-link-menu non-style-link-menu-active">
+                        <div style="padding: 14px 20px; display: flex; align-items: center; color:#ffffff;">
+                            <i class='bx bxs-cog' style="font-size: 19px; margin-right: 12px;"></i>
+                            <span>Inventory</span>
+                        </div>
+                    </a>
+                </td>
+            </tr>
+            <tr class="menu-row">
+                <td class="menu-btn menu-icon-appoinment {% if request.path == '/admin_sales' %} menu-active {% endif %}">
+                    <a href="{% url 'admin_sales' %}" class="non-style-link-menu non-style-link-menu-active">
+                        <div style="padding: 14px 20px; display: flex; align-items: center; color:#ffffff;">
+                            <i class='bx bxs-store' style="font-size: 19px; margin-right: 12px;"></i>
+                            <span>Sales</span>
+                        </div>
+                    </a>
+                </td>
+            </tr>
+            <tr class="menu-row">
+                <td class="menu-btn menu-icon-patient {% if request.path == '/admin_sales_history' %} menu-active {% endif %}">
+                    <a href="{% url 'admin_sales_history' %}" class="non-style-link-menu">
+                        <div style="padding: 14px 20px; display: flex; align-items: center; color:#ffffff;">
+                            <i class='bx bxs-cart-alt' style="font-size: 19px; margin-right: 12px;"></i>
+                            <span>Sales History</span>
+                        </div>
+                    </a>
+                </td>
+            </tr>
+            <tr class="menu-row">
+                <td class="menu-btn menu-icon-patient {% if request.path == '/admin_analysis' %} menu-active {% endif %}">
+                    <a href="{% url 'admin_analysis' %}" class="non-style-link-menu">
+                        <div style="padding: 14px 20px; display: flex; align-items: center; color:#ffffff;">
+                            <i class='bx bxs-pie-chart-alt' style="font-size: 19px; margin-right: 12px;"></i>
+                            <span>Analysis</span>
+                        </div>
+                    </a>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <a href="{% url 'logout' %}" style="text-decoration:none;">
+                        <input type="button" value="Log out" class="logout-btn btn-primary-soft btn">
+                    </a>
+                </td>
+            </tr>
+        </table>
+    </div>
+    <div class="content">
+        {% block content %}
+        {% endblock %}
+    </div>
+
+</body>
+</html>

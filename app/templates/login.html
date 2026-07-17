@@ -1,0 +1,106 @@
+{% extends "auth_index.html" %}
+{% load static %}
+
+{% block content %}
+<style>
+    .auth-card h1{
+        font-family:'Space Grotesk',sans-serif;
+        color:#0B2545;
+        font-size:26px;
+        margin:0 0 6px 0;
+    }
+    .auth-card h4{
+        color:#5A7080;
+        font-weight:500;
+        font-size:14.5px;
+        margin:0 0 26px 0;
+    }
+    .auth-card .form-label{
+        color:#0B2545;
+        font-weight:600;
+        font-size:13.5px;
+        text-transform:uppercase;
+        letter-spacing:0.04em;
+    }
+    .auth-card .form-control{
+        border-radius:9px;
+        border:1.5px solid #E3EAF1;
+        padding:11px 14px;
+        background:#F9FBFD;
+        font-family:'Inter',sans-serif;
+    }
+    .auth-card .form-control:focus{
+        border-color:#17BEBB;
+        box-shadow:none;
+        background:#fff;
+    }
+    .auth-card .input-group-text{
+        background:#F9FBFD;
+        border:1.5px solid #E3EAF1;
+        border-left:none;
+        border-radius:0 9px 9px 0;
+    }
+    .btn-login{
+        background: linear-gradient(135deg,#F4A93A,#DC8E1D);
+        color:#0B2545;
+        border:none;
+        font-weight:700;
+        border-radius:9px;
+        padding:12px;
+        box-shadow:0 8px 18px rgba(244,169,58,0.32);
+    }
+</style>
+
+<h1>Welcome back</h1>
+<h4>Sign in to Inventory to continue 👋</h4>
+<form id="formAuthentication" class="mb-3" method="POST">
+  {% csrf_token %}
+  <div class="mb-3">
+    <label for="email" class="form-label">Username</label>
+    <input
+      type="text"
+      class="form-control"
+      id="email"
+      name="email-username"
+      placeholder="Enter your email or username"
+      autofocus
+      required
+    />
+  </div>
+  <div class="mb-3 form-password-toggle">
+    <div class="d-flex justify-content-between">
+      <label class="form-label" for="password">Password</label>
+      <a href="auth-forgot-password-basic.html">
+      </a>
+    </div>
+    <div class="input-group input-group-merge">
+      <input
+        type="password"
+        id="password"
+        class="form-control"
+        name="password"
+        placeholder="&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;"
+        aria-describedby="password"
+        required
+      />
+      <span class="input-group-text cursor-pointer"><i class="bx bx-hide"></i></span>
+    </div>
+  </div>
+  <div class="mb-3">
+    <button class="btn btn-login d-grid w-100" type="submit">Sign in</button>
+  </div>
+</form>
+<p class="text-center" style="color:#5A7080; font-size:14px;">
+  <span>New on Inventory?</span>
+  <a href="{% url 'signup_page' %}" style="text-decoration: none;">
+    <span style="color:#DC8E1D; font-weight:600;">Create an account</span>
+  </a>
+</p>
+<p class="text-center">
+  <span style="color: #B3261E;">{{error}}</span>
+</p>
+{% endblock %}
+
+{% block login_register %}
+<span class="app-brand-text demo text-body fw-bolder">Login</span>
+{% endblock %}

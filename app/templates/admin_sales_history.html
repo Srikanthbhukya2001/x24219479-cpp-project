@@ -1,0 +1,213 @@
+{% extends 'admin_sidebar.html' %}
+{% load static %}
+
+{% block content %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <title>Sales History</title>
+    <style>
+        .sh-hero{
+            width:100%;
+            padding:44px 48px;
+            background:
+                linear-gradient(120deg, rgba(11,37,69,0.90), rgba(244,169,58,0.35)),
+                url('https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?auto=format&fit=crop&w=1600&q=75') center/cover no-repeat;
+            color:#fff;
+        }
+        .sh-hero h1{font-size:32px; margin:0 0 6px 0; letter-spacing:-0.02em;}
+        .sh-hero p{margin:0; color:rgba(255,255,255,0.85); font-size:14.5px;}
+
+        .dashboard-container{
+            width:100%;
+            padding: 36px 48px 60px 48px;
+            background-color: #F6F8FB;
+            min-height: 100vh;
+        }
+
+        .filter-form{
+            display: flex;
+            gap: 18px;
+            align-items: center;
+            margin-bottom: 24px;
+            flex-wrap:wrap;
+            background:#fff;
+            border:1px solid #E3EAF1;
+            border-radius:12px;
+            padding:18px 22px;
+            box-shadow:0 4px 14px rgba(11,37,69,0.05);
+        }
+        .filter-form label{font-weight:600; font-size:13.5px; color:#0B2545;}
+        .filter-form input[type="date"]{
+            padding: 9px 12px;
+            border: 1.5px solid #E3EAF1;
+            border-radius: 8px;
+            font-size: 14px;
+            font-family:'Inter',sans-serif;
+            background:#F9FBFD;
+        }
+        .filter-form button{
+            padding: 10px 20px;
+            background-color: #0B2545;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight:600;
+            cursor: pointer;
+        }
+        .filter-form button:hover{background:#123863;}
+
+        .btn-export{
+            display:inline-flex;
+            align-items:center;
+            gap:8px;
+            background-color: #2EAD6D;
+            border: none;
+            color:#fff;
+            padding:10px 20px;
+            border-radius:8px;
+            font-weight:600;
+            font-size:14px;
+            text-decoration:none;
+            margin-bottom:24px;
+            box-shadow:0 6px 14px rgba(46,173,109,0.3);
+        }
+        .btn-export:hover{background:#268f5c;}
+
+        .table-scroll{
+            max-height: 460px;
+            overflow-y: auto;
+            border-radius: 12px;
+            box-shadow: 0 8px 24px rgba(11,37,69,0.08);
+            border:1px solid #E3EAF1;
+        }
+
+        .table-class{
+            width: 100%;
+            border-collapse: collapse;
+            background-color: white;
+        }
+
+        thead th{
+            position: sticky;
+            top: 0;
+            background-color: #0B2545;
+            color: white;
+            z-index: 2;
+            font-family:'Space Grotesk',sans-serif;
+            font-weight:600;
+            font-size:13px;
+            text-transform:uppercase;
+            letter-spacing:0.05em;
+        }
+
+        .table-data{
+            padding: 15px 22px;
+            text-align: left;
+            border-bottom: 1px solid #EEF2F6;
+            font-size:14.5px;
+        }
+
+        tbody tr:hover{background:#F9FBFD;}
+
+        .amount-cell{
+            font-family:'IBM Plex Mono',monospace;
+            font-weight:600;
+            color:#DC8E1D;
+        }
+    </style>
+</head>
+<body>
+<div class="sh-hero">
+    <h1>Sales History</h1>
+    <p>Every transaction, filterable by date and ready to export.</p>
+</div>
+
+<div class="dashboard-container">
+
+<div id="alert-container" style="position: fixed; top: 20px; right: 20px; z-index: 9999; width: auto;">
+  {% if messages %}
+    {% for message in messages %}
+      {% if message == 'success' %}
+        <div class="alert bg-success text-white alert-dismissible fade show" role="alert">
+      {% elif message == 'error' %}
+        <div class="alert bg-danger text-white alert-dismissible fade show" role="alert">
+      {% else %}
+        <div class="alert alert-secondary alert-dismissible fade show" role="alert">
+      {% endif %}
+          {{ message }}
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    {% endfor %}
+  {% endif %}
+</div>
+
+    <form method="get" class="filter-form">
+        <label for="start_date">From:</label>
+        <input type="date" name="start_date" id="start_date" value="{{ request.GET.start_date }}">
+
+        <label for="end_date">To:</label>
+        <input type="date" name="end_date" id="end_date" value="{{ request.GET.end_date }}">
+
+        <button type="submit">Filter</button>
+    </form>
+
+
+    <a href="{% url 'export_pdf' %}?start_date={{ request.GET.start_date }}&end_date={{ request.GET.end_date }}" 
+       class="btn btn-success"
+       style="background-color: #17BEBB; border: none; padding: 10px 24px; border-radius: 8px; color: white; text-decoration: none; font-weight: 600;">
+        Download PDF
+    </a>
+
+    <div class="table-scroll">
+        <table class="table-class">
+            <thead>
+            <tr>
+                <th class="table-data">ID</th>
+                <th class="table-data">Customer Name</th>
+                <th class="table-data">Product</th>
+                <th class="table-data">Size</th>
+                <th class="table-data">Quantity</th>
+                <th class="table-data">Amount</th>
+                <th class="table-data">Date</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for sale in sales %}
+                <tr>
+                    <td class="table-data mono">#{{ sale.id }}</td>
+                    <td class="table-data" style="font-weight:600;">{{ sale.customer_name }}</td>
+                    <td class="table-data">{{ sale.product }}</td>
+                    <td class="table-data">{{ sale.size }}</td>
+                    <td class="table-data">{{ sale.quantity }}</td>
+                    <td class="table-data amount-cell">€{{ sale.total_price }}</td>
+                    <td class="table-data" style="color:#5A7080;">{{ sale.sale_date }}</td>
+                </tr>
+            {% empty %}
+                <tr>
+                    <td colspan="7" class="table-data" style="text-align:center; color:#5A7080;">No sales in this date range.</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+  // Automatically fade out alerts after 3 seconds (3000ms)
+  setTimeout(function() {
+    var alertEl = document.querySelector('#alert-container .alert');
+    if (alertEl) {
+      var alert = new bootstrap.Alert(alertEl);
+      alert.close();
+    }
+  }, 3000);
+</script>
+
+
+</body>
+</html>
+{% endblock %}
